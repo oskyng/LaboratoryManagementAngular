@@ -1,1 +1,48 @@
-<p>user-list works!</p>
+<h2 class="mb-4">Gestión de Usuarios</h2>
+
+<div class="card p-3">
+  <div class="d-flex justify-content-end mb-3">
+    <button
+      class="btn btn-primary"
+      *ngIf="auth.hasRole('ADMIN')"
+      (click)="createUser()">
+      + Crear Usuario
+    </button>
+  </div>
+
+  <table class="table table-hover">
+    <thead>
+    <tr>
+      <th>Usuario</th>
+      <th>Nombre</th>
+      <th>Email</th>
+      <th>Rol</th>
+      <th *ngIf="auth.hasRole('ADMIN')">Acciones</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    <tr *ngFor="let user of users">
+      <td>{{ user.username }}</td>
+      <td>{{ user.fullName }}</td>
+      <td>{{ user.email }}</td>
+      <td>{{ user.role }}</td>
+
+      <td *ngIf="auth.hasRole('ADMIN')">
+
+        <button class="btn btn-warning btn-sm me-2"
+                (click)="editUser(user)">
+          Editar
+        </button>
+
+        <button class="btn btn-danger btn-sm"
+                (click)="deleteUser(user.id)">
+          Eliminar
+        </button>
+
+      </td>
+    </tr>
+    </tbody>
+  </table>
+
+</div>

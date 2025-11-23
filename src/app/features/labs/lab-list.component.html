@@ -1,1 +1,34 @@
-<p>lab-list works!</p>
+<h2 class="mb-4">Laboratorios</h2>
+
+<div class="card p-3">
+
+  <table class="table table-hover">
+    <thead>
+    <tr>
+      <th>Nombre</th>
+      <th>Ubicación</th>
+      <th>Capacidad</th>
+      <th>Estado</th>
+      <th *ngIf="auth.hasRole('ADMIN')">Acciones</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    <tr *ngFor="let lab of labs">
+      <td>{{ lab.name }}</td>
+      <td>{{ lab.location }}</td>
+      <td>{{ lab.capacity }}</td>
+      <td>{{ lab.active ? 'Activo' : 'Inactivo' }}</td>
+
+      <td *ngIf="auth.hasRole('ADMIN')">
+        <button class="btn btn-danger btn-sm"
+                (click)="deleteLab(lab.id)">
+          Eliminar
+        </button>
+      </td>
+    </tr>
+    </tbody>
+
+  </table>
+
+</div>

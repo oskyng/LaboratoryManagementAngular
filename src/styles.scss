@@ -1,109 +1,140 @@
-/* ============================
-   PALETA DE COLORES GLOBAL
-============================ */
-$primary: #0052CC;
-$primary-light: #4C9AFF;
-$secondary: #172B4D;
-$background: #F4F5F7;
+:root {
+  --primary: #0D6EFD;
+  --primary-dark: #0B5ED7;
+  --secondary: #6EC9FF;
+  --accent: #033B66;
 
-/* ============================
-   TIPOGRAFÍA
-============================ */
-body {
-  background-color: $background !important;
-  font-family: 'Inter', sans-serif;
-  color: $secondary;
+  --bg-light: #F5F7FA;
+  --text-dark: #333333;
+
+  --success: #2ECC71;
+  --warning: #F1C40F;
+  --danger: #E74C3C;
 }
 
-/* ============================
-   CARDS GLOBALES
-============================ */
+body {
+  font-family: 'Inter', sans-serif;
+  background-color: var(--bg-light);
+  color: var(--text-dark);
+  margin: 0;
+}
+
+
+/* ================================
+   NAVBAR
+   ================================ */
+.navbar {
+  background-color: var(--primary) !important;
+  border-bottom: solid 2px var(--primary-dark);
+}
+
+.navbar .nav-link {
+  color: #fff !important;
+  transition: 0.2s ease-in-out;
+}
+
+.navbar .nav-link:hover {
+  opacity: 0.85;
+}
+
+.navbar .nav-link.active {
+  font-weight: 600;
+  text-decoration: underline;
+}
+
+.dropdown-menu {
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.12);
+}
+
+.dropdown-item:hover {
+  background-color: rgba(13,110,253,0.15);
+}
+
+
+/* ================================
+   CARDS
+   ================================ */
 .card {
   border-radius: 12px;
   border: none;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.06);
+  background-color: #fff;
 }
 
-.card-body {
-  padding: 2rem;
-}
-
-/* ============================
+/* ================================
    BOTONES
-============================ */
+   ================================ */
 .btn-primary {
-  background-color: $primary !important;
-  border: none !important;
-  border-radius: 6px;
+  background-color: var(--primary) !important;
+  border-color: var(--primary) !important;
 }
 
 .btn-primary:hover {
-  background-color: darken($primary, 5%) !important;
+  background-color: var(--primary-dark) !important;
+  border-color: var(--primary-dark) !important;
 }
 
-.btn-secondary {
-  background-color: $secondary !important;
-  border: none !important;
+.btn-danger {
+  background-color: var(--danger) !important;
+  border-color: var(--danger) !important;
 }
 
-.btn {
-  padding: .65rem 1.25rem;
+.btn-success {
+  background-color: var(--success) !important;
+  border-color: var(--success) !important;
+}
+
+/* ================================
+   INPUTS
+   ================================ */
+.form-control {
+  border-radius: 8px;
+  border: 1px solid #CCCCCC;
+  padding: 0.55rem 0.75rem;
+}
+
+.form-control:focus {
+  border-color: var(--primary) !important;
+  box-shadow: 0 0 0 0.2rem rgba(13,110,253,0.25) !important;
+}
+
+.form-label {
   font-weight: 500;
+  color: var(--accent);
 }
 
-/* ============================
+/* ================================
    TABLAS
-============================ */
-table {
-  background: white;
+   ================================ */
+
+.table {
+  background-color: #fff;
+  border-radius: 8px;
+  overflow: hidden;
 }
 
-table thead {
-  background-color: $primary;
-  color: white;
+.table thead {
+  background-color: var(--primary);
+  color: #fff;
 }
 
-table tbody tr:hover {
-  background-color: rgba(76, 154, 255, .1);
+.table-hover tbody tr:hover {
+  background-color: rgba(13,110,253,0.05);
 }
 
-/* ============================
-   FORMULARIOS
-============================ */
-input.form-control,
-select.form-select {
-  border-radius: 6px !important;
+/* ================================
+   UTILIDADES
+   ================================ */
+
+.text-accent {
+  color: var(--accent) !important;
 }
 
-input.form-control:focus,
-select.form-select:focus {
-  border-color: $primary !important;
-  box-shadow: 0 0 0 0.2rem rgba(0, 82, 204, .25) !important;
+.bg-light-custom {
+  background-color: var(--bg-light) !important;
 }
 
-/* ============================
-   LINKS
-============================ */
-a {
-  color: $primary !important;
-}
-
-a:hover {
-  text-decoration: underline;
-}
-
-/* ============================
-   NAVBAR
-============================ */
-.navbar {
-  border-bottom: 3px solid $primary-light;
-}
-
-.nav-link.active {
-  font-weight: bold;
-  text-decoration: underline;
-}
-
-.navbar-brand {
-  font-weight: 600;
-  font-size: 1.2rem;
+.rounded-soft {
+  border-radius: 10px;
 }

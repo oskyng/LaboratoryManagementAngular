@@ -1,14 +1,14 @@
 import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
-import { Router } from '@angular/router';
+import {Router, RouterLink} from '@angular/router';
 import { AuthService } from './auth.service';
 import { FormErrorComponent } from '../../shared/components/form-error.component';
 
 @Component({
   standalone: true,
   selector: 'app-login',
-  imports: [CommonModule, ReactiveFormsModule, FormErrorComponent],
+  imports: [CommonModule, ReactiveFormsModule, FormErrorComponent, RouterLink],
   template: `
     <h2 class="mb-4 text-center">Inicio de sesión</h2>
 
@@ -29,6 +29,11 @@ import { FormErrorComponent } from '../../shared/components/form-error.component
         <button type="submit" class="btn btn-primary" [disabled]="form.invalid || loading">
           {{ loading ? 'Ingresando...' : 'Ingresar' }}
         </button>
+      </div>
+
+      <div class="text-center mt-3">
+        <a routerLink="/auth/register">Crear cuenta</a> |
+        <a routerLink="/auth/recover">¿Olvidaste tu contraseña?</a>
       </div>
 
       <div *ngIf="error" class="alert alert-danger mt-3">
