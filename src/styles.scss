@@ -1,1 +1,109 @@
-/* You can add global styles to this file, and also import other style files */
+/* ============================
+   PALETA DE COLORES GLOBAL
+============================ */
+$primary: #0052CC;
+$primary-light: #4C9AFF;
+$secondary: #172B4D;
+$background: #F4F5F7;
+
+/* ============================
+   TIPOGRAFÍA
+============================ */
+body {
+  background-color: $background !important;
+  font-family: 'Inter', sans-serif;
+  color: $secondary;
+}
+
+/* ============================
+   CARDS GLOBALES
+============================ */
+.card {
+  border-radius: 12px;
+  border: none;
+}
+
+.card-body {
+  padding: 2rem;
+}
+
+/* ============================
+   BOTONES
+============================ */
+.btn-primary {
+  background-color: $primary !important;
+  border: none !important;
+  border-radius: 6px;
+}
+
+.btn-primary:hover {
+  background-color: darken($primary, 5%) !important;
+}
+
+.btn-secondary {
+  background-color: $secondary !important;
+  border: none !important;
+}
+
+.btn {
+  padding: .65rem 1.25rem;
+  font-weight: 500;
+}
+
+/* ============================
+   TABLAS
+============================ */
+table {
+  background: white;
+}
+
+table thead {
+  background-color: $primary;
+  color: white;
+}
+
+table tbody tr:hover {
+  background-color: rgba(76, 154, 255, .1);
+}
+
+/* ============================
+   FORMULARIOS
+============================ */
+input.form-control,
+select.form-select {
+  border-radius: 6px !important;
+}
+
+input.form-control:focus,
+select.form-select:focus {
+  border-color: $primary !important;
+  box-shadow: 0 0 0 0.2rem rgba(0, 82, 204, .25) !important;
+}
+
+/* ============================
+   LINKS
+============================ */
+a {
+  color: $primary !important;
+}
+
+a:hover {
+  text-decoration: underline;
+}
+
+/* ============================
+   NAVBAR
+============================ */
+.navbar {
+  border-bottom: 3px solid $primary-light;
+}
+
+.nav-link.active {
+  font-weight: bold;
+  text-decoration: underline;
+}
+
+.navbar-brand {
+  font-weight: 600;
+  font-size: 1.2rem;
+}
