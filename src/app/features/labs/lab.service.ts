@@ -1,45 +1,35 @@
 import { Injectable } from '@angular/core';
-import { Lab } from '../../models/lab.model';
-import { LabAssignment } from '../../models/assignment.model';
-import { Observable, of } from 'rxjs';
+import { HttpClient } from '@angular/common/http';
+import { environment } from '../../../environments/environment';
+import { Laboratory, AssignmentRequest } from '../../models/laboratory.model';
+import { Observable } from 'rxjs';
 
 @Injectable({ providedIn: 'root' })
 export class LabService {
 
-  private labs: Lab[] = [
-    { id: 1, name: 'Laboratorio Central', location: 'Piso 1', capacity: 15, active: true },
-    { id: 2, name: 'Laboratorio Hematología', location: 'Piso 2', capacity: 10, active: true }
-  ];
+  private apiUrl = `${environment.apiUrl}/laboratory`;
+  private assignmentUrl = `${environment.apiUrl}/assignment`;
 
-  private assignments: LabAssignment[] = [];
+  constructor(private http: HttpClient) {}
 
-  private idCounter = 3;
-  private assignmentCounter = 1;
-
-  findAll(): Observable<Lab[]> {
-    return of(this.labs);
+  findAll(): Observable<Laboratory[]> {
+    return this.http.get<Laboratory[]>(this.apiUrl);
   }
 
-  create(lab: Lab): Observable<Lab> {
-    lab.id = this.idCounter++;
-    this.labs.push(lab);
-    return of(lab);
+  create(lab: Laboratory): Observable<Laboratory> {
+    return this.http.post<Laboratory>(this.apiUrl, lab);
   }
 
-  update(id: number, lab: Lab): Observable<Lab> {
-    const index = this.labs.findIndex(l => l.id === id);
-    if (index !== -1) this.labs[index] = lab;
-    return of(lab);
+  update(id: number, lab: Laboratory): Observable<Laboratory> {
+    return this.http.put<Laboratory>(`${this.apiUrl}/${id}`, lab);
   }
 
   delete(id: number): Observable<void> {
-    this.labs = this.labs.filter(l => l.id !== id);
-    return of(undefined);
+    return this.http.delete<void>(`${this.apiUrl}/${id}`);
   }
 
-  assignLab(assignment: LabAssignment): Observable<LabAssignment> {
-    assignment.id = this.assignmentCounter++;
-    this.assignments.push(assignment);
-    return of(assignment);
+  assign(request: AssignmentRequest): Observable<any> {
+    // POST /api/assignment
+    return this.http.post<any>(this.assignmentUrl, request);
   }
 }

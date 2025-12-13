@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { UserService } from './user.service';
 import { User } from '../../models/user.model';
 import { UserFormComponent } from './user-form.component';
+import { AuthService } from '../auth/auth.service';
 
 @Component({
   standalone: true,
@@ -11,7 +12,7 @@ import { UserFormComponent } from './user-form.component';
   template: `
     <div class="d-flex justify-content-between align-items-center mb-3">
       <h2>Gestión de Usuarios</h2>
-      <button class="btn btn-success" (click)="newUser()">Nuevo usuario</button>
+      <button class="btn btn-success" (click)="newUser()" *ngIf="isAdmin()">Nuevo usuario</button>
     </div>
 
     <!-- LISTA -->
@@ -38,8 +39,8 @@ import { UserFormComponent } from './user-form.component';
               <span class="badge bg-secondary" *ngIf="!u.active">No</span>
             </td>
             <td class="text-end">
-              <button class="btn btn-sm btn-primary me-2" (click)="editUser(u)">Editar</button>
-              <button class="btn btn-sm btn-danger" (click)="deleteUser(u)">Eliminar</button>
+              <button class="btn btn-sm btn-primary me-2" (click)="editUser(u)" *ngIf="isAdmin()">Editar</button>
+              <button class="btn btn-sm btn-danger" (click)="deleteUser(u)" *ngIf="isAdmin()">Eliminar</button>
             </td>
           </tr>
         </tbody>
@@ -59,7 +60,7 @@ export class UserListComponent implements OnInit {
   users: User[] = [];               // ← lista/colección Angular
   selectedUser: User | null = null; // ← manipulación de información con variables Angular
 
-  constructor(private userService: UserService) {}
+  constructor(private userService: UserService, private auth: AuthService) {}
 
   ngOnInit(): void {
     this.loadUsers();
@@ -97,5 +98,9 @@ export class UserListComponent implements OnInit {
 
   onCancelled(): void {
     this.selectedUser = null;
+  }
+
+  isAdmin(): boolean {
+    return this.auth.hasAnyRole('ADMIN');
   }
 }

@@ -1,7 +1,7 @@
 import { Component, EventEmitter, Input, OnChanges, Output, SimpleChanges } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
-import { Lab } from '../../models/lab.model';
+import { Laboratory } from '../../models/laboratory.model';
 import { LabService } from './lab.service';
 import { FormErrorComponent } from '../../shared/components/form-error.component';
 
@@ -25,24 +25,26 @@ import { FormErrorComponent } from '../../shared/components/form-error.component
             </div>
 
             <div class="col-12 col-md-6 mb-3">
-              <label class="form-label">Ubicación</label>
-              <input type="text" class="form-control" formControlName="location">
-              <app-form-error [control]="form.get('location')"></app-form-error>
+              <label class="form-label">Dirección</label>
+              <input type="text" class="form-control" formControlName="address">
+              <app-form-error [control]="form.get('address')"></app-form-error>
             </div>
           </div>
 
           <div class="row">
             <div class="col-12 col-md-6 mb-3">
-              <label class="form-label">Capacidad</label>
-              <input type="number" class="form-control" formControlName="capacity" min="1">
-              <app-form-error [control]="form.get('capacity')"></app-form-error>
+              <label class="form-label">Teléfono</label>
+              <input type="text" class="form-control" formControlName="phone">
+              <app-form-error [control]="form.get('phone')"></app-form-error>
             </div>
 
-            <div class="col-12 col-md-6 mb-3 d-flex align-items-center">
-              <div class="form-check mt-3">
-                <input class="form-check-input" type="checkbox" formControlName="active" id="chkActiveLab">
-                <label class="form-check-label" for="chkActiveLab">Activo</label>
-              </div>
+            <div class="col-12 col-md-6 mb-3">
+              <label class="form-label">Estado</label>
+              <select class="form-select" formControlName="status">
+                <option value="ACTIVO">ACTIVO</option>
+                <option value="INACTIVO">INACTIVO</option>
+              </select>
+              <app-form-error [control]="form.get('status')"></app-form-error>
             </div>
           </div>
 
@@ -62,8 +64,8 @@ import { FormErrorComponent } from '../../shared/components/form-error.component
   `
 })
 export class LabFormComponent implements OnChanges {
-  @Input() lab!: Lab;
-  @Output() saved = new EventEmitter<Lab>();
+  @Input() lab!: Laboratory;
+  @Output() saved = new EventEmitter<Laboratory>();
   @Output() cancelled = new EventEmitter<void>();
 
   form: FormGroup;
@@ -74,9 +76,9 @@ export class LabFormComponent implements OnChanges {
     this.form = this.fb.group({
       id: [null],
       name: ['', [Validators.required, Validators.minLength(3)]],
-      location: ['', [Validators.required]],
-      capacity: [0, [Validators.required]],
-      active: [true]
+      address: ['', []],
+      phone: ['', []],
+      status: ['ACTIVO', []]
     });
   }
 
@@ -92,7 +94,7 @@ export class LabFormComponent implements OnChanges {
     this.loading = true;
     this.error = null;
 
-    const value: Lab = this.form.value;
+    const value: Laboratory = this.form.value;
 
     const req$ = value.id
       ? this.labService.update(value.id, value)

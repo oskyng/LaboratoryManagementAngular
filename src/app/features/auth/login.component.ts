@@ -14,9 +14,9 @@ import { FormErrorComponent } from '../../shared/components/form-error.component
 
     <form [formGroup]="form" (ngSubmit)="onSubmit()" novalidate>
       <div class="mb-3">
-        <label class="form-label">Usuario</label>
-        <input type="text" class="form-control" formControlName="username">
-        <app-form-error [control]="form.get('username')"></app-form-error>
+        <label class="form-label">Email</label>
+        <input type="email" class="form-control" formControlName="email">
+        <app-form-error [control]="form.get('email')"></app-form-error>
       </div>
 
       <div class="mb-3">
@@ -53,7 +53,7 @@ export class LoginComponent {
     private router: Router
   ) {
     this.form = this.fb.group({
-      username: ['', [Validators.required, Validators.minLength(3)]],
+      email: ['', [Validators.required, Validators.email]],
       password: ['', [Validators.required, Validators.minLength(4)]]
     });
   }

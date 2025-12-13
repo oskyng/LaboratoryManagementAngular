@@ -1,23 +1,96 @@
-import { ComponentFixture, TestBed } from '@angular/core/testing';
-
+import { ComponentFixture, TestBed, fakeAsync, tick } from '@angular/core/testing';
 import { LabListComponent } from './lab-list.component';
+import { LabService } from './lab.service';
+import { of, throwError } from 'rxjs';
+import { Laboratory } from '../../models/laboratory.model';
 
 describe('LabListComponent', () => {
   let component: LabListComponent;
   let fixture: ComponentFixture<LabListComponent>;
+  let labServiceMock: jasmine.SpyObj<LabService>;
+
+  const labs: Laboratory[] = [
+    { id: 1, name: 'Lab 1', address: 'A1', phone: '1', status: 'ACTIVO' },
+    { id: 2, name: 'Lab 2', address: 'A2', phone: '2', status: 'INACTIVO' }
+  ];
 
   beforeEach(async () => {
+    labServiceMock = jasmine.createSpyObj<LabService>('LabService', [
+      'findAll', 'delete', 'assign'
+    ]);
+    labServiceMock.findAll.and.returnValue(of(labs));
+
     await TestBed.configureTestingModule({
-      imports: [LabListComponent]
-    })
-    .compileComponents();
-    
+      imports: [LabListComponent],
+      providers: [
+        { provide: LabService, useValue: labServiceMock }
+      ]
+    }).compileComponents();
+
     fixture = TestBed.createComponent(LabListComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
   });
 
-  it('should create', () => {
+  it('debe crear y cargar laboratorios en ngOnInit', () => {
     expect(component).toBeTruthy();
+    expect(component.labs.length).toBe(2);
   });
+
+  it('deleteLab no hace nada si no hay id', () => {
+    const lab: Laboratory = { name: 'Sin Id' } as any;
+    component.deleteLab(lab);
+    expect(labServiceMock.delete).not.toHaveBeenCalled();
+  });
+
+  it('deleteLab debe confirmar y eliminar cuando confirma true', () => {
+    spyOn(window, 'confirm').and.returnValue(true);
+    labServiceMock.delete.and.returnValue(of(void 0));
+    labServiceMock.findAll.and.returnValue(of([])); // recarga
+
+    component.deleteLab(labs[0]);
+    expect(window.confirm).toHaveBeenCalled();
+    expect(labServiceMock.delete).toHaveBeenCalledWith(1);
+  });
+
+  it('deleteLab no elimina cuando confirma false', () => {
+    spyOn(window, 'confirm').and.returnValue(false);
+    component.deleteLab(labs[0]);
+    expect(labServiceMock.delete).not.toHaveBeenCalled();
+  });
+
+  it('openAssign/cancelAssign deben mostrar/ocultar formulario', () => {
+    expect(component.assignFormVisible).toBeFalse();
+    component.openAssign(labs[0]);
+    expect(component.assignFormVisible).toBeTrue();
+    expect(component.currentLab?.id).toBe(1);
+    component.cancelAssign();
+    expect(component.assignFormVisible).toBeFalse();
+    expect(component.currentLab).toBeNull();
+  });
+
+  it('assign éxito debe mostrar mensaje y resetear loading', fakeAsync(() => {
+    labServiceMock.assign.and.returnValue(of({}));
+    component.openAssign(labs[0]);
+    component.assignmentForm.setValue({ userId: 10 });
+
+    component.assign();
+    tick();
+
+    expect(labServiceMock.assign).toHaveBeenCalledWith({ laboratoryId: 1, userId: 10 });
+    expect(component.loadingAssign).toBeFalse();
+    expect(component.assignMessage).toContain('correctamente');
+  }));
+
+  it('assign error debe mostrar mensaje de error', fakeAsync(() => {
+    labServiceMock.assign.and.returnValue(throwError(() => ({ status: 400 })));
+    component.openAssign(labs[1]);
+    component.assignmentForm.setValue({ userId: 10 });
+
+    component.assign();
+    tick();
+
+    expect(component.loadingAssign).toBeFalse();
+    expect(component.assignMessage).toContain('Error');
+  }));
 });

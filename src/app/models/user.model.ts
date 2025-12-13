@@ -1,8 +1,9 @@
 export interface User {
   id?: number;
-  username: string;
   fullName: string;
   email: string;
-  role: 'ADMIN' | 'LAB_TECH' | 'DOCTOR';
-  active: boolean;
+  role: string; // según OpenAPI es un string libre
+  password?: string; // usado para creación/actualización cuando aplique
+  username?: string; // opcional, mantenido por compatibilidad con UI legacy
+  active?: boolean;
 }

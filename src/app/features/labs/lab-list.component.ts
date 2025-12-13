@@ -1,10 +1,11 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { Lab } from '../../models/lab.model';
+import { Laboratory } from '../../models/laboratory.model';
 import { LabService } from './lab.service';
 import { LabFormComponent } from './lab-form.component';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { FormErrorComponent } from '../../shared/components/form-error.component';
+import { AuthService } from '../auth/auth.service';
 
 @Component({
   standalone: true,
@@ -13,7 +14,7 @@ import { FormErrorComponent } from '../../shared/components/form-error.component
   template: `
     <div class="d-flex justify-content-between align-items-center mb-3">
       <h2>Gestión de Laboratorios</h2>
-      <button class="btn btn-success" (click)="newLab()">Nuevo laboratorio</button>
+      <button class="btn btn-success" (click)="newLab()" *ngIf="isAdmin()">Nuevo laboratorio</button>
     </div>
 
     <!-- LISTA -->
@@ -22,25 +23,22 @@ import { FormErrorComponent } from '../../shared/components/form-error.component
         <thead>
           <tr>
             <th>Nombre</th>
-            <th>Ubicación</th>
-            <th>Capacidad</th>
-            <th>Activo</th>
+            <th>Dirección</th>
+            <th>Teléfono</th>
+            <th>Estado</th>
             <th class="text-end">Acciones</th>
           </tr>
         </thead>
         <tbody>
           <tr *ngFor="let lab of labs">
             <td>{{ lab.name }}</td>
-            <td>{{ lab.location }}</td>
-            <td>{{ lab.capacity }}</td>
-            <td>
-              <span class="badge bg-success" *ngIf="lab.active">Sí</span>
-              <span class="badge bg-secondary" *ngIf="!lab.active">No</span>
-            </td>
+            <td>{{ lab.address || '-' }}</td>
+            <td>{{ lab.phone || '-' }}</td>
+            <td><span class="badge" [ngClass]="lab.status === 'ACTIVO' ? 'bg-success' : 'bg-secondary'">{{ lab.status || '-' }}</span></td>
             <td class="text-end">
-              <button class="btn btn-sm btn-primary me-2" (click)="editLab(lab)">Editar</button>
-              <button class="btn btn-sm btn-danger me-2" (click)="deleteLab(lab)">Eliminar</button>
-              <button class="btn btn-sm btn-outline-info" (click)="openAssign(lab)">Asignar</button>
+              <button class="btn btn-sm btn-primary me-2" (click)="editLab(lab)" *ngIf="isAdmin()">Editar</button>
+              <button class="btn btn-sm btn-danger me-2" (click)="deleteLab(lab)" *ngIf="isAdmin()">Eliminar</button>
+              <button class="btn btn-sm btn-outline-info" (click)="openAssign(lab)" *ngIf="canAssign()">Asignar</button>
             </td>
           </tr>
         </tbody>
@@ -62,20 +60,10 @@ import { FormErrorComponent } from '../../shared/components/form-error.component
 
         <form [formGroup]="assignmentForm" (ngSubmit)="assign()" novalidate>
           <div class="row">
-            <div class="col-12 col-md-4 mb-3">
-              <label class="form-label">ID Paciente</label>
-              <input type="number" class="form-control" formControlName="patientId">
-              <app-form-error [control]="assignmentForm.get('patientId')"></app-form-error>
-            </div>
-            <div class="col-12 col-md-4 mb-3">
-              <label class="form-label">Tipo de examen</label>
-              <input type="text" class="form-control" formControlName="examType">
-              <app-form-error [control]="assignmentForm.get('examType')"></app-form-error>
-            </div>
-            <div class="col-12 col-md-4 mb-3">
-              <label class="form-label">Fecha programada</label>
-              <input type="date" class="form-control" formControlName="scheduledDate">
-              <app-form-error [control]="assignmentForm.get('scheduledDate')"></app-form-error>
+            <div class="col-12 col-md-6 mb-3">
+              <label class="form-label">ID Usuario</label>
+              <input type="number" class="form-control" formControlName="userId">
+              <app-form-error [control]="assignmentForm.get('userId')"></app-form-error>
             </div>
           </div>
 
@@ -95,9 +83,9 @@ import { FormErrorComponent } from '../../shared/components/form-error.component
   `
 })
 export class LabListComponent implements OnInit {
-  labs: Lab[] = [];                         // ← lista/colección Angular
-  selectedLab: Lab | null = null;
-  currentLab: Lab | null = null;
+  labs: Laboratory[] = [];                         // ← lista/colección Angular
+  selectedLab: Laboratory | null = null;
+  currentLab: Laboratory | null = null;
 
   assignmentForm: FormGroup;
   assignFormVisible = false;
@@ -106,12 +94,11 @@ export class LabListComponent implements OnInit {
 
   constructor(
     private labService: LabService,
-    private fb: FormBuilder
+    private fb: FormBuilder,
+    private auth: AuthService
   ) {
     this.assignmentForm = this.fb.group({
-      patientId: [null, [Validators.required]],
-      examType: ['', [Validators.required]],
-      scheduledDate: ['', [Validators.required]]
+      userId: [null, [Validators.required]]
     });
   }
 
@@ -124,20 +111,20 @@ export class LabListComponent implements OnInit {
   }
 
   newLab(): void {
-    this.selectedLab = { name: '', location: '', capacity: 0, active: true };
+    this.selectedLab = { name: '', address: '', phone: '', status: 'ACTIVO' };
   }
 
-  editLab(lab: Lab): void {
+  editLab(lab: Laboratory): void {
     this.selectedLab = { ...lab };
   }
 
-  deleteLab(lab: Lab): void {
+  deleteLab(lab: Laboratory): void {
     if (!lab.id) return;
     if (!confirm(`¿Eliminar laboratorio ${lab.name}?`)) return;
     this.labService.delete(lab.id).subscribe(() => this.loadLabs());
   }
 
-  onSaved(_: Lab): void {
+  onSaved(_: Laboratory): void {
     this.selectedLab = null;
     this.loadLabs();
   }
@@ -146,7 +133,7 @@ export class LabListComponent implements OnInit {
     this.selectedLab = null;
   }
 
-  openAssign(lab: Lab): void {
+  openAssign(lab: Laboratory): void {
     this.currentLab = lab;
     this.assignFormVisible = true;
     this.assignMessage = null;
@@ -162,13 +149,11 @@ export class LabListComponent implements OnInit {
     if (!this.currentLab || this.assignmentForm.invalid) return;
 
     this.loadingAssign = true;
-    const formValue = this.assignmentForm.value;
+    const formValue = this.assignmentForm.value as { userId: number };
 
-    this.labService.assignLab({
-      labId: this.currentLab.id!,
-      patientId: formValue.patientId,
-      examType: formValue.examType,
-      scheduledDate: formValue.scheduledDate
+    this.labService.assign({
+      laboratoryId: this.currentLab.id!,
+      userId: formValue.userId
     }).subscribe({
       next: () => {
         this.loadingAssign = false;
@@ -179,5 +164,14 @@ export class LabListComponent implements OnInit {
         this.assignMessage = 'Error al asignar laboratorio.';
       }
     });
+  }
+
+  // Permisos por rol
+  isAdmin(): boolean {
+    return this.auth.hasAnyRole('ADMIN');
+  }
+
+  canAssign(): boolean {
+    return this.auth.hasAnyRole('ADMIN', 'DOCTOR');
   }
 }

@@ -1,78 +1,72 @@
 import { Injectable } from '@angular/core';
-import { Observable, of, throwError } from 'rxjs';
+import { HttpClient } from '@angular/common/http';
+import { environment } from '../../../environments/environment';
+import { Observable, tap, of } from 'rxjs';
+import { User } from '../../models/user.model';
 
 @Injectable({ providedIn: 'root' })
 export class AuthService {
 
-  private users = [
-    {
-      username: 'admin',
-      password: '1234',
-      email: 'admin@labs.cl',
-      fullName: 'Administrador General',
-      role: 'ADMIN'
-    },
-    {
-      username: 'jdoe',
-      password: '1234',
-      email: 'jdoe@labs.cl',
-      fullName: 'John Doe',
-      role: 'USER'
-    }
-  ];
+  private apiUrl = `${environment.apiUrl}/user`;
 
-  login(data: { username: string, password: string }): Observable<any> {
-    const found = this.users.find(
-      u => u.username === data.username && u.password === data.password
+  constructor(private http: HttpClient) {}
+
+  login(data: { email: string; password: string }): Observable<any> {
+    return this.http.post<any>(`${this.apiUrl}/login`, data).pipe(
+      tap(res => {
+        if (res) {
+          localStorage.setItem('userId', String(res.id ?? ''));
+          localStorage.setItem('fullName', res.fullName ?? '');
+          localStorage.setItem('email', res.email ?? '');
+          localStorage.setItem('role', res.role ?? '');
+        }
+      })
     );
-
-    if (!found) return throwError(() => new Error('INVALID_CREDENTIALS'));
-
-    localStorage.setItem('token', 'local-token');
-    localStorage.setItem('username', found.username);
-    localStorage.setItem('fullName', found.fullName);
-    localStorage.setItem('email', found.email);
-    localStorage.setItem('role', found.role);
-
-    return of(found);
   }
 
-  register(data: any): Observable<any> {
-    const exists = this.users.some(
-      u => u.username === data.username || u.email === data.email
-    );
-
-    if (exists) return throwError(() => new Error('USER_EXISTS'));
-
-    this.users.push(data);
-    return of(data);
-  }
-
-  recover(email: string): Observable<any> {
-    const exists = this.users.find(u => u.email === email);
-    if (!exists) return throwError(() => new Error('EMAIL_NOT_FOUND'));
-
-    return of({ message: 'Correo enviado correctamente.' });
-  }
-
-  getCurrentUser() {
-    return {
-      username: localStorage.getItem('username'),
-      email: localStorage.getItem('email'),
-      fullName: localStorage.getItem('fullName'),
-      role: localStorage.getItem('role')
-    };
+  logout(): void {
+    localStorage.clear();
   }
 
   isLoggedIn(): boolean {
-    return !!localStorage.getItem('token');
+    return !!localStorage.getItem('email');
   }
 
   hasRole(role: string): boolean {
     return localStorage.getItem('role') === role;
   }
 
-  logout(): void {
-    localStorage.clear();
+  hasAnyRole(...roles: string[]): boolean {
+    const r = localStorage.getItem('role');
+    return !!r && roles.includes(r);
+  }
+
+  isRole(role: string): boolean {
+    return this.hasRole(role);
+  }
+
+  getCurrentUser() {
+    return {
+      id: Number(localStorage.getItem('userId') ?? 0) || undefined,
+      fullName: localStorage.getItem('fullName'),
+      email: localStorage.getItem('email'),
+      role: localStorage.getItem('role')
+    };
+  }
+
+  // Registro de usuario según OpenAPI: POST /api/user con UserCreateRequest
+  register(data: { fullName: string; email: string; password: string; role?: string; username?: string }): Observable<User> {
+    const payload = {
+      fullName: data.fullName,
+      email: data.email,
+      password: data.password,
+      role: data.role ?? 'USER'
+    };
+    return this.http.post<User>(`${this.apiUrl}`, payload);
+  }
+
+  // Recuperación de contraseña: no existe en OpenAPI, devolvemos una respuesta informativa
+  recover(email: string): Observable<{ message: string }> {
+    return of({ message: 'Si tu correo está registrado, recibirás instrucciones para recuperar tu contraseña.' });
   }
 }

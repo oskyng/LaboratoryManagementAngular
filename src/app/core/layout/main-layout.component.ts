@@ -27,6 +27,14 @@ import { AuthService } from '../../features/auth/auth.service';
             <li class="nav-item" *ngIf="loggedIn">
               <a routerLink="/labs" routerLinkActive="active" class="nav-link">Laboratorios</a>
             </li>
+            <!-- Resultados para ADMIN/DOCTOR -->
+            <li class="nav-item" *ngIf="loggedIn && auth.hasAnyRole('ADMIN','DOCTOR')">
+              <a routerLink="/results" routerLinkActive="active" class="nav-link">Resultados</a>
+            </li>
+            <!-- Mis resultados para PACIENTE -->
+            <li class="nav-item" *ngIf="loggedIn && auth.hasAnyRole('PATIENT')">
+              <a routerLink="/results/mine" routerLinkActive="active" class="nav-link">Mis resultados</a>
+            </li>
             <li class="nav-item" *ngIf="loggedIn">
               <a routerLink="/profile" routerLinkActive="active" class="nav-link">Mi Perfil</a>
             </li>

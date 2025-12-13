@@ -14,7 +14,7 @@ import { AuthService } from './auth.service';
 
       <p><strong>Nombre:</strong> {{ user.fullName }}</p>
       <p><strong>Correo:</strong> {{ user.email }}</p>
-      <p><strong>Usuario:</strong> {{ user.username }}</p>
+      <p><strong>Rol:</strong> {{ user.role }}</p>
 
     </div>
   </div>
