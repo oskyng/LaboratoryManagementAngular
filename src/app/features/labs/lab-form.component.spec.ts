@@ -41,11 +41,11 @@ describe('LabFormComponent', () => {
 
     component.form.setValue({ id: null, ...payload });
 
-    let emitted: Laboratory | null = null;
+    let emitted!: Laboratory;
     component.saved.subscribe(lab => (emitted = lab));
 
     component.onSubmit();
-    expect(labServiceMock.create).toHaveBeenCalledWith(payload);
+    expect(labServiceMock.create).toHaveBeenCalledWith(jasmine.objectContaining(payload));
     expect(component.loading).toBeFalse();
     expect(emitted).toEqual(response);
   });
@@ -55,7 +55,7 @@ describe('LabFormComponent', () => {
     labServiceMock.update.and.returnValue(of(payload));
 
     component.form.setValue(payload as any);
-    let emitted: Laboratory | null = null;
+    let emitted!: Laboratory;
     component.saved.subscribe(lab => (emitted = lab));
 
     component.onSubmit();

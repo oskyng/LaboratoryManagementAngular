@@ -1,6 +1,7 @@
 import { ComponentFixture, TestBed, fakeAsync, tick } from '@angular/core/testing';
 import { LabListComponent } from './lab-list.component';
 import { LabService } from './lab.service';
+import { AuthService } from '../auth/auth.service';
 import { of, throwError } from 'rxjs';
 import { Laboratory } from '../../models/laboratory.model';
 
@@ -19,11 +20,14 @@ describe('LabListComponent', () => {
       'findAll', 'delete', 'assign'
     ]);
     labServiceMock.findAll.and.returnValue(of(labs));
+    const authMock = jasmine.createSpyObj<AuthService>('AuthService', ['hasAnyRole']);
+    authMock.hasAnyRole.and.returnValue(true);
 
     await TestBed.configureTestingModule({
       imports: [LabListComponent],
       providers: [
-        { provide: LabService, useValue: labServiceMock }
+        { provide: LabService, useValue: labServiceMock },
+        { provide: AuthService, useValue: authMock }
       ]
     }).compileComponents();
 

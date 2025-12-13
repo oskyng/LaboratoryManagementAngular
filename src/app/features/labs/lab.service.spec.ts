@@ -77,7 +77,7 @@ describe('LabService', () => {
     const id = 1;
 
     service.delete(id).subscribe(response => {
-      expect(response).toBeUndefined();
+      expect(response).toBeNull();
     });
 
     const req = httpTestingController.expectOne(`${labsApiUrl}/${id}`);

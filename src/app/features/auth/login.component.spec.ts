@@ -53,7 +53,7 @@ describe('LoginComponent', () => {
   it('onSubmit error debe mostrar mensaje', fakeAsync(() => {
     authMock.login.and.returnValue(throwError(() => ({ status: 401 })));
 
-    component.form.setValue({ email: 'a@b.c', password: 'bad' });
+    component.form.setValue({ email: 'a@b.c', password: 'bad1' });
     component.onSubmit();
     tick();
 
