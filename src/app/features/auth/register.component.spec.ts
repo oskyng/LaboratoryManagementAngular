@@ -34,6 +34,8 @@ describe('RegisterComponent', () => {
   it('no debe enviar con formulario inválido', () => {
     component.form.setValue({ fullName: '', email: '', username: '', password: '' });
     expect(component.form.invalid).toBeTrue();
+    component.onSubmit();
+    expect(authMock.register).not.toHaveBeenCalled();
   });
 
   it('onSubmit éxito debe mostrar success y navegar a login', fakeAsync(() => {

@@ -51,6 +51,46 @@ describe('AuthService', () => {
     req.flush(resBody);
   });
 
+  it('login() debe persistir valores por defecto cuando faltan campos (nullish)', () => {
+    const reqBody = { email: 'u@a.cl', password: 'secret' };
+    // respuesta con id undefined y sin fullName/email/role
+    const resBody: any = { id: undefined };
+
+    // limpiar estado previo
+    (localStorage.clear as any)();
+
+    service.login(reqBody).subscribe(res => {
+      expect(res).toEqual(resBody);
+      // userId se guarda como String(res.id ?? '') => '' cuando id es undefined
+      expect(localStorage.getItem('userId')).toBe('');
+      // fullName/email/role usan ?? ''
+      expect(localStorage.getItem('fullName')).toBe('');
+      expect(localStorage.getItem('email')).toBe('');
+      expect(localStorage.getItem('role')).toBe('');
+    });
+
+    const req = http.expectOne(`${apiUrl}/login`);
+    expect(req.request.method).toBe('POST');
+    req.flush(resBody);
+  });
+
+  it('login() no debe persistir nada si la respuesta es null', () => {
+    const reqBody = { email: 'u@a.cl', password: 'secret' };
+
+    // limpiamos posibles valores previos
+    (localStorage.clear as any)();
+
+    service.login(reqBody).subscribe(res => {
+      expect(res).toBeNull();
+      expect(localStorage.getItem('email')).toBeNull();
+      expect(localStorage.getItem('userId')).toBeNull();
+    });
+
+    const req = http.expectOne(`${apiUrl}/login`);
+    expect(req.request.method).toBe('POST');
+    req.flush(null);
+  });
+
   it('isLoggedIn() y getCurrentUser() deben reflejar estado según localStorage', () => {
     expect(service.isLoggedIn()).toBeFalse();
     (localStorage.setItem as any)('email', 'x@y.z');
@@ -67,6 +107,21 @@ describe('AuthService', () => {
     (localStorage.setItem as any)('email', 'x@y.z');
     service.logout();
     expect(service.isLoggedIn()).toBeFalse();
+  });
+
+  it('hasRole/hasAnyRole/isRole deben evaluar correctamente roles positivos y negativos', () => {
+    // sin rol
+    expect(service.hasRole('ADMIN')).toBeFalse();
+    expect(service.hasAnyRole('ADMIN', 'USER')).toBeFalse();
+    expect(service.isRole('ADMIN')).toBeFalse();
+
+    // rol USER
+    (localStorage.setItem as any)('role', 'USER');
+    expect(service.hasRole('ADMIN')).toBeFalse();
+    expect(service.hasRole('USER')).toBeTrue();
+    expect(service.hasAnyRole('ADMIN', 'LAB_TECH')).toBeFalse();
+    expect(service.hasAnyRole('ADMIN', 'USER')).toBeTrue();
+    expect(service.isRole('USER')).toBeTrue();
   });
 
   it('register() debe POST /api/user', () => {
@@ -90,5 +145,11 @@ describe('AuthService', () => {
     });
     // no deben existir requests pendientes
     http.verify();
+  });
+
+  it('getCurrentUser() debe retornar id undefined cuando userId es 0', () => {
+    (localStorage.setItem as any)('userId', '0');
+    const u = service.getCurrentUser();
+    expect(u.id).toBeUndefined();
   });
 });

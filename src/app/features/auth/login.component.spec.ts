@@ -36,6 +36,13 @@ describe('LoginComponent', () => {
     expect(component.form.invalid).toBeTrue();
   });
 
+  it('onSubmit no debe llamar login si el formulario es inválido (early return)', () => {
+    authMock.login.calls.reset();
+    component.form.setValue({ email: '', password: '' });
+    component.onSubmit();
+    expect(authMock.login).not.toHaveBeenCalled();
+  });
+
   it('onSubmit éxito debe navegar a /users', fakeAsync(() => {
     authMock.login.and.returnValue(of({} as any));
     const navSpy = spyOn(router, 'navigate');

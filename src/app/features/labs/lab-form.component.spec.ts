@@ -73,4 +73,12 @@ describe('LabFormComponent', () => {
     expect(component.loading).toBeFalse();
     expect(component.error).toContain('Error al guardar');
   });
+
+  it('ngOnChanges debe patchValue cuando cambia @Input lab', () => {
+    const incoming: Laboratory = { id: 33, name: 'Lab Patch', address: 'Calle', phone: '123', status: 'ACTIVO' };
+    component.lab = incoming;
+    component.ngOnChanges({ lab: { currentValue: incoming, previousValue: null, firstChange: true, isFirstChange: () => true } });
+    expect(component.form.value.name).toBe('Lab Patch');
+    expect(component.form.value.id).toBe(33);
+  });
 });
