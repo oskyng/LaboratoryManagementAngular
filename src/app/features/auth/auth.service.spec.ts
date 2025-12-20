@@ -147,9 +147,27 @@ describe('AuthService', () => {
     http.verify();
   });
 
-  it('getCurrentUser() debe retornar id undefined cuando userId es 0', () => {
+  it('getCurrentUser() debe retornar id undefined cuando userId es 0 o no existe', () => {
     (localStorage.setItem as any)('userId', '0');
-    const u = service.getCurrentUser();
+    let u = service.getCurrentUser();
     expect(u.id).toBeUndefined();
+
+    (localStorage.clear as any)();
+    u = service.getCurrentUser();
+    expect(u.id).toBeUndefined();
+  });
+
+  it('register() debe usar role USER por defecto si no se proporciona', () => {
+    const payload = { fullName: 'New', email: 'n@a.cl', password: '123456' };
+    const response = { id: 99, fullName: 'New', email: 'n@a.cl', role: 'USER' };
+
+    service.register(payload).subscribe(res => {
+      expect(res).toEqual(response as any);
+    });
+
+    const req = http.expectOne(`${apiUrl}`);
+    expect(req.request.method).toBe('POST');
+    expect(req.request.body.role).toBe('USER');
+    req.flush(response);
   });
 });

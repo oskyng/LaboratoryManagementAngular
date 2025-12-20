@@ -97,4 +97,40 @@ describe('LabListComponent', () => {
     expect(component.loadingAssign).toBeFalse();
     expect(component.assignMessage).toContain('Error');
   }));
+
+  it('newLab debe inicializar selectedLab', () => {
+    component.newLab();
+    expect(component.selectedLab).toEqual({ name: '', address: '', phone: '', status: 'ACTIVO' });
+  });
+
+  it('editLab debe copiar el lab a selectedLab', () => {
+    component.editLab(labs[0]);
+    expect(component.selectedLab).toEqual({ ...labs[0] });
+    expect(component.selectedLab).not.toBe(labs[0]);
+  });
+
+  it('onSaved debe resetear selectedLab y recargar lista', () => {
+    component.selectedLab = labs[0];
+    spyOn(component, 'loadLabs');
+    component.onSaved(labs[0]);
+    expect(component.selectedLab).toBeNull();
+    expect(component.loadLabs).toHaveBeenCalled();
+  });
+
+  it('onCancelled debe resetear selectedLab', () => {
+    component.selectedLab = labs[0];
+    component.onCancelled();
+    expect(component.selectedLab).toBeNull();
+  });
+
+  it('assign no debe hacer nada si currentLab es null o form es inválido', () => {
+    component.currentLab = null;
+    component.assign();
+    expect(labServiceMock.assign).not.toHaveBeenCalled();
+
+    component.currentLab = labs[0];
+    component.assignmentForm.setValue({ userId: null });
+    component.assign();
+    expect(labServiceMock.assign).not.toHaveBeenCalled();
+  });
 });

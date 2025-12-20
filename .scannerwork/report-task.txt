@@ -2,5 +2,5 @@ projectKey=angular-tets
 serverUrl=http://localhost:9000
 serverVersion=25.12.0.117093
 dashboardUrl=http://localhost:9000/dashboard?id=angular-tets
-ceTaskId=54573500-7987-4eca-a8b0-2be22405c00d
-ceTaskUrl=http://localhost:9000/api/ce/task?id=54573500-7987-4eca-a8b0-2be22405c00d
+ceTaskId=e8d8f255-a239-4340-bf5b-8ba188a1e32b
+ceTaskUrl=http://localhost:9000/api/ce/task?id=e8d8f255-a239-4340-bf5b-8ba188a1e32b
